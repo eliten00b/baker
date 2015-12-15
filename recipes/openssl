@@ -1,0 +1,12 @@
+SOURCE_URL="https://github.com/openssl/openssl/archive/OpenSSL_${VERSION//./_}.tar.gz"
+DEPENDENCIES=
+
+PRE_CONFIGURE_COMMAND=
+CONFIGURE_TOOL='./config'
+CONFIGURE_ARGS='shared --prefix=/usr/local --install_prefix=/tmp'
+POST_CONFIGURE_COMMAND=
+
+PRE_MAKE_COMMAND=
+MAKE_TOOL='MAKE="make -j4" make'
+MAKE_ARGS='-j4 install_sw'
+POST_MAKE_COMMAND=
