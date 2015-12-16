@@ -6,4 +6,5 @@ RUN apt-get update -qq && \
 
 RUN mkdir /baker
 
-CMD ["/baker/docker/compile.sh"]
+ENTRYPOINT ["/baker/compile.sh"]
+CMD ["help"]
