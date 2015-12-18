@@ -46,7 +46,7 @@ if [[ ! -z "$DEPENDENCIES" ]]; then
     DEP_VERSION="$(echo "${DEP_PACKAGE_TAR%.tar.gz}" | awk -F- '{print $3}')"
     echo "found dependency package tar: $DEP_PACKAGE_TAR $DEP_VERSION"
     USED_DEPENDENCIES="${USED_DEPENDENCIES},${DEP}:${DEP_VERSION}"
-    echo tar xz -C /usr/local -f "${BASE_PATH}/packages/${DEP_PACKAGE_TAR}"
+    tar xz -C /usr/local -f "${BASE_PATH}/packages/${DEP_PACKAGE_TAR}"
   done < <(echo -n "$DEPENDENCIES" | xargs -d, -n1)
 fi
 USED_DEPENDENCIES="${USED_DEPENDENCIES#,}"
@@ -59,5 +59,6 @@ echo "all dependencies: $USED_DEPENDENCIES"
 
 echo "package_list entry: ${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}"
 echo "Remove old entries for $PACKAGE"
+touch compiled_packages
 sed -i "/^$PACKAGE/d" compiled_packages
 echo "${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}" >> compiled_packages

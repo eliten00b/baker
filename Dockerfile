@@ -6,5 +6,6 @@ RUN apt-get update -qq && \
 
 RUN mkdir /baker
 
-ENTRYPOINT ["/baker/compile.sh"]
+WORKDIR /baker
+ENTRYPOINT ["/baker/scripts/compile.sh"]
 CMD ["help"]
