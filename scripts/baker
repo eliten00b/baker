@@ -1,0 +1,1 @@
+docker run --rm -ti -v $(realpath ${0%/*}/..):/baker baker "$@"
