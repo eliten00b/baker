@@ -1,4 +1,4 @@
-SOURCE_URL="http://www.greenwoodsoftware.com/less/less-481.tar.gz"
+SOURCE_URL="http://www.greenwoodsoftware.com/less/less-${VERSION}.tar.gz"
 DEPENDENCIES=""
 
 PRE_CONFIGURE_COMMAND=
@@ -8,5 +8,5 @@ POST_CONFIGURE_COMMAND=
 
 PRE_MAKE_COMMAND=
 MAKE_TOOL=
-MAKE_ARGS='-j4 install DESTDIR=/tmp/baker'
+MAKE_ARGS='-j4 install DESTDIR=/tmp'
 POST_MAKE_COMMAND=
