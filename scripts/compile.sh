@@ -90,7 +90,11 @@ $MAKE_TOOL $MAKE_ARGS 2>&1 # || die "Compiling failed: Exitcode $?"
 EXITCODE=$?
 echo "Done compile with exitcode: $EXITCODE"
 echo -e "\n\n\n"
-[[ -z "$POST_MAKE_COMMAND" ]] || $POST_MAKE_COMMAND
+if [[ ! -z "$POST_MAKE_COMMAND" ]]; then
+  $POST_MAKE_COMMAND
+  EXITCODE=$?
+  echo "Done post compile with exitcode: $EXITCODE"
+fi
 
 cd - > /dev/null
 
