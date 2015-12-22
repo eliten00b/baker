@@ -4,3 +4,4 @@ less:481
 ncurses:6.0
 nmap:6.47
 openssl:1.0.2b
+perl:5.22.1

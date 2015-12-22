@@ -1,0 +1,12 @@
+SOURCE_URL="http://www.cpan.org/src/5.0/perl-${VERSION}.tar.gz"
+DEPENDENCIES=
+
+PRE_CONFIGURE_COMMAND=
+CONFIGURE_TOOL="./Configure -des -Dprefix=$PREFIX -Dinstallprefix=${DESTDIR}${PREFIX}"
+CONFIGURE_ARGS=
+POST_CONFIGURE_COMMAND=
+
+PRE_MAKE_COMMAND=
+MAKE_TOOL=
+MAKE_ARGS="-j4"
+POST_MAKE_COMMAND="make install"
