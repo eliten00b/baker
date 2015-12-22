@@ -3,7 +3,7 @@ DEPENDENCIES="openssl"
 
 PRE_CONFIGURE_COMMAND=
 CONFIGURE_TOOL=
-CONFIGURE_ARGS='--prefix=$PREFIX --with-ssl=/usr/local'
+CONFIGURE_ARGS="--prefix=$PREFIX --with-ssl=/usr/local"
 POST_CONFIGURE_COMMAND=
 
 PRE_MAKE_COMMAND=
