@@ -1,5 +1,6 @@
 curl:7.45.0
 git:2.6.2
 less:481
+ncurses:6.0
 nmap:6.47
 openssl:1.0.2b

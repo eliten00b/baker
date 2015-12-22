@@ -2,10 +2,13 @@
 
 die() {
   echo "$1"
+  echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds"
   exit 1
 }
 
-BASE_PATH="/baker"
+STARTTIME="$(date "+%s")"
+
+[[ -z "$BASE_PATH" ]] && BASE_PATH="/baker"
 
 
 # Check arguments
@@ -19,6 +22,7 @@ VERSION="$2"
 
 TEMP_DIR="/tmp"
 PREFIX="/usr/local"
+DESTDIR="/tmp"
 
 
 # Check and load recipe
@@ -58,6 +62,7 @@ if [[ ! -z "$DEPENDENCIES" ]]; then
 else
   echo "No dependencies required."
 fi
+echo -e "\n\n\n"
 
 
 # Compile package
@@ -69,22 +74,29 @@ tar xzf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" -C ${TEMP_DIR}/ || die "Unpac
 
 cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 
-[[ -z "$PRE_CONFIGURE_COMMAND" ]] || die "PRE_CONFIGURE_COMMAND not implemented"
-[[ -z "$POST_CONFIGURE_COMMAND" ]] || die "POST_CONFIGURE_COMMAND not implemented"
-[[ -z "$PRE_MAKE_COMMAND" ]] || die "PRE_MAKE_COMMAND not implemented"
-[[ -z "$POST_MAKE_COMMAND" ]] || die "POST_MAKE_COMMAND not implemented"
-
 [[ -z "$CONFIGURE_TOOL" ]] && CONFIGURE_TOOL="./configure"
 [[ -z "$MAKE_TOOL" ]] && MAKE_TOOL="make"
 
+[[ -z "$PRE_CONFIGURE_COMMAND" ]] || die "PRE_CONFIGURE_COMMAND not implemented"
+echo -e "\n\n\n"
 $CONFIGURE_TOOL $CONFIGURE_ARGS
-$MAKE_TOOL $MAKE_ARGS
+echo -e "\n\n\n"
+[[ -z "$POST_CONFIGURE_COMMAND" ]] || die "POST_CONFIGURE_COMMAND not implemented"
+
+
+[[ -z "$PRE_MAKE_COMMAND" ]] || $PRE_MAKE_COMMAND
+echo -e "\n\n\n"
+$MAKE_TOOL $MAKE_ARGS 2>&1 # || die "Compiling failed: Exitcode $?"
+EXITCODE=$?
+echo "Done compile with exitcode: $EXITCODE"
+echo -e "\n\n\n"
+[[ -z "$POST_MAKE_COMMAND" ]] || $POST_MAKE_COMMAND
 
 cd - > /dev/null
 
-cd ${TEMP_DIR}${PREFIX}
-tar czf /baker/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz * --owner=0 --group=0
-chown ${USERID}:${GROUPID}  /baker/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz
+cd ${TEMP_DIR}${PREFIX} || die "Nothing installed"
+tar czf "${BASE_PATH}/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" * --owner=0 --group=0 || die "Create tar package failed"
+[[ ! -z "$USERID" ]] && [[ ! -z "$GROUPID" ]] && chown ${USERID}:${GROUPID} "${BASE_PATH}/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz"
 
 cd - > /dev/null
 
@@ -97,3 +109,5 @@ echo "Remove old entries for $PACKAGE"
 touch compiled_packages
 sed -i "/^$PACKAGE/d" compiled_packages
 echo "${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}" >> compiled_packages
+
+echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds"
