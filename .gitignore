@@ -1,3 +1,3 @@
-packages/*.tar.gz
+packages/**
 
 compiled_packages

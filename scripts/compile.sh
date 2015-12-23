@@ -48,12 +48,13 @@ USED_DEPENDENCIES=""
 
 if [[ ! -z "$DEPENDENCIES" ]]; then
   while read DEP; do
-    DEP_PACKAGE_TAR="$(ls -1 -v "$BASE_PATH/packages/" | grep -- "-${DEP}-" | tail -n1)"
+    mkdir -p "$BASE_PATH/packages/${DEP}"
+    DEP_PACKAGE_TAR="$(ls -1 -v "$BASE_PATH/packages/${DEP}" | grep -- "-${DEP}-" | tail -n1)"
     [[ -z "$DEP_PACKAGE_TAR" ]] && die "dependency package tar not found: $DEP"
     DEP_VERSION="$(echo "${DEP_PACKAGE_TAR%.tar.gz}" | awk -F- '{print $3}')"
     echo "found dependency package tar: $DEP_PACKAGE_TAR $DEP_VERSION"
     USED_DEPENDENCIES="${USED_DEPENDENCIES},${DEP}:${DEP_VERSION}"
-    tar xz -C ${PREFIX}/ -f "${BASE_PATH}/packages/${DEP_PACKAGE_TAR}"
+    tar xz -C ${PREFIX}/ -f "${BASE_PATH}/packages/${DEP}/${DEP_PACKAGE_TAR}"
   done < <(echo -n "$DEPENDENCIES" | xargs -d, -n1)
 
   USED_DEPENDENCIES="${USED_DEPENDENCIES#,}"
@@ -99,8 +100,9 @@ fi
 cd - > /dev/null
 
 cd ${TEMP_DIR}${PREFIX} || die "Nothing installed"
-tar czf "${BASE_PATH}/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" * --owner=0 --group=0 || die "Create tar package failed"
-[[ ! -z "$USERID" ]] && [[ ! -z "$GROUPID" ]] && chown ${USERID}:${GROUPID} "${BASE_PATH}/packages/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz"
+mkdir -p "${BASE_PATH}/packages/${PACKAGE}"
+tar czf "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" * --owner=0 --group=0 || die "Create tar package failed"
+[[ ! -z "$USERID" ]] && [[ ! -z "$GROUPID" ]] && chown -R ${USERID}:${GROUPID} "${BASE_PATH}/packages/"
 
 cd - > /dev/null
 
