@@ -4,6 +4,7 @@ ncurses 6.0
 openssl 1.0.2e
 perl 5.22.1
 patch 2.7.5
+readline 6.3
 lua 5.3.2
 curl 7.45.0
 less 481
