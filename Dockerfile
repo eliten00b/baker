@@ -2,7 +2,7 @@ FROM resin/rpi-raspbian
 MAINTAINER eliten00b
 
 RUN apt-get update -qq && \
-    apt-get install -qqy make autoconf gcc g++ curl
+    apt-get install -qqy make autoconf gcc g++ curl gettext
 
 RUN mkdir /baker
 
