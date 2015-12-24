@@ -10,9 +10,9 @@ die() {
 
 log_or_die() {
   if [[ $1 -eq 0 ]]; then
-    echo $2 | tee -a $SUMMARY
+    echo "$2" | tee -a $SUMMARY
   else
-    die $([[ ! -z "$3" ]] && echo $3 || echo $2)
+    die "$([[ ! -z "$3" ]] && echo $3 || echo $2)"
   fi
 }
 
@@ -89,7 +89,7 @@ cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 [[ -z "$CONFIGURE_TOOL" ]] && CONFIGURE_TOOL="./configure"
 [[ -z "$MAKE_TOOL" ]] && MAKE_TOOL="make"
 
-[[ -z "$PRE_CONFIGURE_COMMAND" ]] || $PRE_CONFIGURE_COMMAND
+[[ -z "$PRE_CONFIGURE_COMMAND" ]] || eval "$PRE_CONFIGURE_COMMAND"
 echo -e "\n\n\n"
 $CONFIGURE_TOOL $CONFIGURE_ARGS
 EXITCODE=$?
@@ -98,14 +98,14 @@ echo -e "\n\n\n"
 [[ -z "$POST_CONFIGURE_COMMAND" ]] || die "POST_CONFIGURE_COMMAND not implemented"
 
 
-[[ -z "$PRE_MAKE_COMMAND" ]] || $PRE_MAKE_COMMAND
+[[ -z "$PRE_MAKE_COMMAND" ]] || eval "$PRE_MAKE_COMMAND"
 echo -e "\n\n\n"
 $MAKE_TOOL $MAKE_ARGS
 EXITCODE=$?
 log_or_die $EXITCODE "Done compile with exitcode: $EXITCODE"
 echo -e "\n\n\n"
 if [[ ! -z "$POST_MAKE_COMMAND" ]]; then
-  $POST_MAKE_COMMAND
+  eval "$POST_MAKE_COMMAND"
   EXITCODE=$?
   log_or_die $EXITCODE "Done post compile with exitcode: $EXITCODE"
 fi
@@ -116,6 +116,8 @@ cd ${TEMP_DIR}${PREFIX} || die "Nothing installed"
 mkdir -p "${BASE_PATH}/packages/${PACKAGE}"
 tar czf "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" * --owner=0 --group=0 || die "Create tar package failed"
 [[ ! -z "$USERID" ]] && [[ ! -z "$GROUPID" ]] && chown -R ${USERID}:${GROUPID} "${BASE_PATH}/packages/"
+PACKAGE_SIZE="$(ls -lh "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" | cut -d' ' -f4)
+echo "Package size: $PACKAGE_SIZE" | tee -a $SUMMARY
 
 cd - > /dev/null
 
