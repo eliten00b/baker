@@ -1,0 +1,12 @@
+SOURCE_URL="https://nmap.org/dist/nmap-${VERSION}.tgz"
+DEPENDENCIES="openssl,zlib,readline"
+
+PRE_CONFIGURE_COMMAND=
+CONFIGURE_TOOL=
+CONFIGURE_ARGS="--prefix=$PREFIX --with-openssl=/usr/local --without-zenmap"
+POST_CONFIGURE_COMMAND=
+
+PRE_MAKE_COMMAND=
+MAKE_TOOL=
+MAKE_ARGS=
+POST_MAKE_COMMAND="make install DESTDIR=$DESTDIR"
