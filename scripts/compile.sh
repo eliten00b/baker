@@ -116,7 +116,7 @@ cd ${TEMP_DIR}${PREFIX} || die "Nothing installed"
 mkdir -p "${BASE_PATH}/packages/${PACKAGE}"
 tar czf "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" * --owner=0 --group=0 || die "Create tar package failed"
 [[ ! -z "$USERID" ]] && [[ ! -z "$GROUPID" ]] && chown -R ${USERID}:${GROUPID} "${BASE_PATH}/packages/"
-PACKAGE_SIZE="$(ls -lh "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" | cut -d' ' -f4)"
+PACKAGE_SIZE="$(ls -lh "${BASE_PATH}/packages/${PACKAGE}/$(uname -m)-${PACKAGE}-${VERSION}.tar.gz" | cut -d' ' -f5)"
 echo "Package size: $PACKAGE_SIZE" | tee -a $SUMMARY
 
 cd - > /dev/null
