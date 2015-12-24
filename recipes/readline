@@ -1,5 +1,5 @@
 SOURCE_URL="http://ftp.gnu.org/gnu/readline/readline-${VERSION}.tar.gz"
-DEPENDENCIES=
+DEPENDENCIES="termcap"
 
 PRE_CONFIGURE_COMMAND=
 CONFIGURE_TOOL=
