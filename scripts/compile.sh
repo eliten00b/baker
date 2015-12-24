@@ -1,12 +1,23 @@
 #!/bin/bash
 
 die() {
-  echo "$1"
-  echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds"
+  echo "FAILED: $1" | tee -a $SUMMARY
+  echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds" | tee -a $SUMMARY
+  echo -e "\n\nSUMMARY\n"
+  cat $SUMMARY
   exit 1
 }
 
+log_or_die() {
+  if [[ $1 -eq 0 ]]; then
+    echo $2 | tee -a $SUMMARY
+  else
+    die $([[ ! -z "$3" ]] && echo $3 || echo $2)
+  fi
+}
+
 STARTTIME="$(date "+%s")"
+SUMMARY="/tmp/summary.log"
 
 [[ -z "$BASE_PATH" ]] && BASE_PATH="/baker"
 
@@ -37,7 +48,7 @@ source "$BASE_PATH/recipes/${PACKAGE}"
 # Check upwards dependencies
 
 UDEPENDENCIES="$(grep "$PACKAGE" $BASE_PATH/compiled_packages | grep -v "^${PACKAGE}|")"
-echo "Packages need to recompile: $UDEPENDENCIES"
+echo "Packages need to recompile: $UDEPENDENCIES" | tee -a $SUMMARY
 
 
 # Check downwards dependencies
@@ -58,10 +69,10 @@ if [[ ! -z "$DEPENDENCIES" ]]; then
   done < <(echo -n "$DEPENDENCIES" | xargs -d, -n1)
 
   USED_DEPENDENCIES="${USED_DEPENDENCIES#,}"
-  echo "all dependencies: $USED_DEPENDENCIES"
+  echo "all dependencies: $USED_DEPENDENCIES" | tee -a $SUMMARY
 
 else
-  echo "No dependencies required."
+  echo "No dependencies required." | tee -a $SUMMARY
 fi
 echo -e "\n\n\n"
 
@@ -81,20 +92,22 @@ cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 [[ -z "$PRE_CONFIGURE_COMMAND" ]] || $PRE_CONFIGURE_COMMAND
 echo -e "\n\n\n"
 $CONFIGURE_TOOL $CONFIGURE_ARGS
+EXITCODE=$?
+log_or_die $EXITCODE "Done configure with exitcode: $EXITCODE"
 echo -e "\n\n\n"
 [[ -z "$POST_CONFIGURE_COMMAND" ]] || die "POST_CONFIGURE_COMMAND not implemented"
 
 
 [[ -z "$PRE_MAKE_COMMAND" ]] || $PRE_MAKE_COMMAND
 echo -e "\n\n\n"
-$MAKE_TOOL $MAKE_ARGS 2>&1 # || die "Compiling failed: Exitcode $?"
+$MAKE_TOOL $MAKE_ARGS
 EXITCODE=$?
-echo "Done compile with exitcode: $EXITCODE"
+log_or_die $EXITCODE "Done compile with exitcode: $EXITCODE"
 echo -e "\n\n\n"
 if [[ ! -z "$POST_MAKE_COMMAND" ]]; then
   $POST_MAKE_COMMAND
   EXITCODE=$?
-  echo "Done post compile with exitcode: $EXITCODE"
+  log_or_die $EXITCODE "Done post compile with exitcode: $EXITCODE"
 fi
 
 cd - > /dev/null
@@ -110,10 +123,14 @@ rm -rf ${TEMP_DIR}/usr
 
 # Create entry for compiled_packages
 
-echo "package_list entry: ${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}"
+echo "package_list entry: ${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}" | tee -a $SUMMARY
 echo "Remove old entries for $PACKAGE"
 touch compiled_packages
 sed -i "/^$PACKAGE/d" compiled_packages
 echo "${PACKAGE}|${VERSION}|${USED_DEPENDENCIES}" >> compiled_packages
 
-echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds"
+echo "Time: $(expr $(date "+%s") - $STARTTIME) seconds" | tee -a $SUMMARY
+
+echo -e "\n\nSUMMARY\n"
+cat $SUMMARY
+echo "SUCCESSFUL"
