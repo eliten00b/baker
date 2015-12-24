@@ -1,0 +1,15 @@
+SOURCE_URL="https://github.com/cjlin1/liblinear/archive/v${VERSION}.tar.gz"
+DEPENDENCIES=
+
+PRE_CONFIGURE_COMMAND=
+CONFIGURE_TOOL="true" # No configure tool
+CONFIGURE_ARGS=
+POST_CONFIGURE_COMMAND=
+
+PRE_MAKE_COMMAND=
+MAKE_TOOL=
+MAKE_ARGS="-j4 lib"
+POST_MAKE_COMMAND="mkdir -p ${DESTDIR}${PREFIX}/include ${DESTDIR}${PREFIX}/lib && \
+    cp $TEMP_DIR/liblinear-${VERSION}/linear.h ${DESTDIR}${PREFIX}/include/ && \
+    cp $TEMP_DIR/liblinear-${VERSION}/liblinear.so.3 ${DESTDIR}${PREFIX}/lib/ && \
+    cp $TEMP_DIR/liblinear-${VERSION}/liblinear.so.3 ${DESTDIR}${PREFIX}/lib/liblinear.so" # Does not have install
