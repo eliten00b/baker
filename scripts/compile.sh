@@ -78,7 +78,7 @@ cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 [[ -z "$CONFIGURE_TOOL" ]] && CONFIGURE_TOOL="./configure"
 [[ -z "$MAKE_TOOL" ]] && MAKE_TOOL="make"
 
-[[ -z "$PRE_CONFIGURE_COMMAND" ]] || die "PRE_CONFIGURE_COMMAND not implemented"
+[[ -z "$PRE_CONFIGURE_COMMAND" ]] || $PRE_CONFIGURE_COMMAND
 echo -e "\n\n\n"
 $CONFIGURE_TOOL $CONFIGURE_ARGS
 echo -e "\n\n\n"
