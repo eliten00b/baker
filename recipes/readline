@@ -1,9 +1,9 @@
 SOURCE_URL="http://ftp.gnu.org/gnu/readline/readline-${VERSION}.tar.gz"
-DEPENDENCIES="termcap"
+DEPENDENCIES="termcap,ncurses"
 
 PRE_CONFIGURE_COMMAND=
 CONFIGURE_TOOL=
-CONFIGURE_ARGS="--prefix=$PREFIX"
+CONFIGURE_ARGS="--prefix=$PREFIX --with-curses"
 POST_CONFIGURE_COMMAND=
 
 PRE_MAKE_COMMAND=
