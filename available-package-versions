@@ -1,10 +1,10 @@
-curl:7.45.0
-git:2.6.2
-less:481
-lzo:2.09
-ncurses:6.0
-nmap:6.47
-openssl:1.0.2b
-perl:5.22.1
-tinc:1.0.26
-zlib:1.2.8
+lzo 2.09
+zlib 1.2.8
+ncurses 6.0
+openssl 1.0.2e
+perl 5.22.1
+curl 7.45.0
+less 481
+git 2.6.4
+nmap 6.47
+tinc 1.0.26
