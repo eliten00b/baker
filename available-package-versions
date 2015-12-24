@@ -7,6 +7,7 @@ perl 5.22.1
 liblinear 210
 flex 2.5.39
 bison 3.0.4
+libpcre 8.37
 libpcap 1.7.4
 patch 2.7.5
 readline 6.3
