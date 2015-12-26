@@ -1,0 +1,72 @@
+#!/bin/bash
+
+die() {
+  echo $1
+  exit 1
+}
+
+if [[ "$1" = "-h" ]] || [[ $# -lt 1 ]]; then
+  cat <<-EOS
+Usage: $0 PACKAGE_FILE
+EOS
+  exit 2
+fi
+
+package_folder() {
+  drive list -n -q "title = '$PACKAGE' and '$BASE_FOLDER' in parents and mimeType = 'application/vnd.google-apps.folder'" | cut -d' ' -f1
+}
+
+
+PACKAGE_FILE="${1##*/}"
+PACKAGE="$(echo $PACKAGE_FILE | cut -d- -f2)"
+
+
+BASE_FOLDER="$(drive list -n -q "title = 'bread-packages' and mimeType = 'application/vnd.google-apps.folder'" | cut -d' ' -f1)"
+echo -e "base folder: $BASE_FOLDER\n"
+
+PACKAGE_FOLDER="$(package_folder)"
+echo -e "package folder: $PACKAGE_FOLDER\n"
+
+if [[ $(echo "$PACKAGE_FOLDER" | wc -l) -gt 1 ]]; then
+  die "more than one package folder"
+fi
+
+if [[ -z "$PACKAGE_FOLDER" ]]; then
+  echo "create package folder"
+  drive folder -t "$PACKAGE" -p "$BASE_FOLDER"
+  PACKAGE_FOLDER="$(package_folder)"
+fi
+
+
+PACKAGE_IDS="$(drive list -n -q "title contains '$PACKAGE_FILE' and '$PACKAGE_FOLDER' in parents" | cut -d' ' -f1)"
+echo -e "packages:\n$PACKAGE_IDS\n"
+
+if [[ ! -z "$PACKAGE_IDS" ]]; then
+  if [[ $(echo "$PACKAGE_IDS" | wc -l) -gt 1 ]]; then
+    die "multiple package files already uploaded"
+  fi
+
+  if [[ $(echo "$PACKAGE_IDS" | wc -l) -eq 1 ]]; then
+    echo "Package file already uploaded, try to delete..."
+    drive delete -i "$PACKAGE_IDS"
+  fi
+fi
+
+echo "start upload.."
+drive upload -f "$1" -p "$PACKAGE_FOLDER" || die "upload failed"
+
+echo "update package list"
+PACKAGE_LIST_ID="$(drive list -n -q "title = 'package_list' and '$BASE_FOLDER' in parents" | cut -d' ' -f1)"
+
+if [[ -z "$PACKAGE_LIST_ID" ]]; then
+  echo "no package list"
+  grep -G "^${PACKAGE}|" compiled_packages | drive upload -s -t "package_list" -p "$BASE_FOLDER"
+
+else
+  echo "found package list, will update"
+  PACKAGE_LIST="$(cat <(drive download -s -i "$PACKAGE_LIST_ID" | grep -vG "^${PACKAGE}|") <(grep -G "^${PACKAGE}|" compiled_packages))"
+  echo -e "New package list:\n$PACKAGE_LIST\n"
+
+  drive delete -i "$PACKAGE_LIST_ID"
+  echo "$PACKAGE_LIST" | drive upload -s -p "$BASE_FOLDER" -t "package_list"
+fi
