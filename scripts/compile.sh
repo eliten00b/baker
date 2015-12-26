@@ -82,7 +82,7 @@ echo -e "\n\n\n"
 echo "Download package source"
 DL_CODE=$(curl -w "%{http_code}" -SL -o "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" "$SOURCE_URL")
 [[ "$DL_CODE" != "200" ]] && die "Download failed: $DL_CODE"
-tar xzf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" -C ${TEMP_DIR}/ || die "Unpacking tar ball failed"
+tar xf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" -C ${TEMP_DIR}/ || die "Unpacking tar ball failed"
 
 cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 
