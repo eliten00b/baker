@@ -34,6 +34,15 @@ VERSION="$2"
 TEMP_DIR="/tmp"
 PREFIX="/usr/local"
 DESTDIR="/tmp"
+LIBDIR="${PREFIX}/lib"
+
+export LD_LIBRARY_PATH="${LIBDIR}:${LD_LIBRARY_PATH}"
+export LD_RUN_PATH="${LIBDIR}:${LD_RUN_PATH}"
+
+LDFLAGS="-L/usr/lib -L${LIBDIR}"
+CFLAGS="-I${PREFIX}/include"
+CXXFLAGS="-I${PREFIX}/include"
+CPPFLAGS="-I${PREFIX}/include"
 
 
 # Check and load recipe
@@ -91,16 +100,20 @@ cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
 
 [[ -z "$PRE_CONFIGURE_COMMAND" ]] || eval "$PRE_CONFIGURE_COMMAND"
 echo -e "\n\n\n"
-$CONFIGURE_TOOL $CONFIGURE_ARGS
+eval "$CONFIGURE_TOOL $CONFIGURE_ARGS"
 EXITCODE=$?
 log_or_die $EXITCODE "Done configure with exitcode: $EXITCODE"
 echo -e "\n\n\n"
-[[ -z "$POST_CONFIGURE_COMMAND" ]] || die "POST_CONFIGURE_COMMAND not implemented"
+if [[ ! -z "$POST_CONFIGURE_COMMAND" ]]; then
+  eval "$POST_CONFIGURE_COMMAND"
+  EXITCODE=$?
+  log_or_die $EXITCODE "Done post configure with exitcode: $EXITCODE"
+fi
 
 
 [[ -z "$PRE_MAKE_COMMAND" ]] || eval "$PRE_MAKE_COMMAND"
 echo -e "\n\n\n"
-$MAKE_TOOL $MAKE_ARGS
+eval "$MAKE_TOOL $MAKE_ARGS"
 EXITCODE=$?
 log_or_die $EXITCODE "Done compile with exitcode: $EXITCODE"
 echo -e "\n\n\n"
