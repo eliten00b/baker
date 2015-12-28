@@ -93,7 +93,8 @@ DL_CODE=$(curl -w "%{http_code}" -SL -o "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.g
 [[ "$DL_CODE" != "200" ]] && die "Download failed: $DL_CODE"
 tar xf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" -C ${TEMP_DIR}/ || die "Unpacking tar ball failed"
 
-cd ${TEMP_DIR}/$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)
+SOURCE_FOLDER="$(tar tf "${TEMP_DIR}/${PACKAGE}-${VERSION}.tar.gz" | head -1)"
+cd ${TEMP_DIR}/${SOURCE_FOLDER%%/*}
 
 [[ -z "$CONFIGURE_TOOL" ]] && CONFIGURE_TOOL="./configure"
 [[ -z "$MAKE_TOOL" ]] && MAKE_TOOL="make"
